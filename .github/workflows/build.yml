@@ -1,0 +1,38 @@
+name: Build Android Release
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.10.6'
+
+      - name: Get Dependencies
+        run: |
+          cd easynotes
+          flutter pub get
+
+      - name: Build Unsigned AAB
+        run: |
+          cd easynotes
+          flutter build appbundle --release
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release-aab
+          path: easynotes/build/app/outputs/bundle/release/app-release.aab
